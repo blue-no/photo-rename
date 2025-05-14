@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "photo-rename"
+version = "0.1.0"
+description = "A simple tool to rename image files using their taken date — perfect for organizing messy photo folders."
+authors = ["blueno <k.pg.blueno@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.2"
+pillow = "^11.2.1"
+pyside6 = "^6.9.0"
+pillow-heif = "^0.22.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pyinstaller = "^6.13.0"
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

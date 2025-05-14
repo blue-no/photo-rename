@@ -1,0 +1,7 @@
+.pytest_cache/
+.venv/
+.vscode/
+build/
+dist/
+__pycache__/
+*.spec

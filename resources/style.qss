@@ -1,0 +1,9 @@
+QWidget {
+    font-family: "Meiryo UI";
+    font-size: 10pt;
+}
+
+QPushButton, QLineEdit {
+    min-height: 22px;
+    min-width: 100px;
+}
