@@ -119,24 +119,24 @@ class FileTypes:
     __dict = {
         "すべての画像ファイル": __all,
         "HEIFファイル": ["heic", "heif"],
-        "JPEGファイル ": ["jpg", "jpeg"],
-        "PNGファイル ": ["png"],
-        "BMPファイル ": ["bmp"],
-        "GIFファイル ": ["gif"],
+        "JPEGファイル": ["jpg", "jpeg"],
+        "PNGファイル": ["png"],
+        "BMPファイル": ["bmp"],
+        "GIFファイル": ["gif"],
     }
 
     @classmethod
     def get_all_filters(cls) -> str:
         filter_str = ""
         for name, suffixes in cls.__dict.items():
-            suffix_str = " *.".join(suffixes)
+            suffix_str = " ".join(["*."+s for s in suffixes])
             filter_str += f";;{name} ({suffix_str})"
         return filter_str
 
     @classmethod
     def get_filter(cls, name: str) -> str:
         suffixes = cls.__dict[name]
-        suffix_str = " *.".join(suffixes)
+        suffix_str = " ".join(["*." + s for s in suffixes])
         return f"{name} ({suffix_str})"
 
     @classmethod
