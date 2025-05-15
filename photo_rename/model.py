@@ -34,7 +34,7 @@ class MainWindowModel(QObject):
         self._path_map: list[PathMap] = []
         self._paths: list[str] = []
 
-    def create_path_map(self, paths: str) -> None:
+    def create_path_map(self, paths: list[str]) -> None:
         map_ = []
         other_paths = []
         for path in paths:
