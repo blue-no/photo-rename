@@ -26,22 +26,18 @@ class DateProperty:
     dtype: DateType
 
 
-def parse_datestr(date_str: str) -> str:
-    date_chars = ["Y", "y", "m", "d", "H", "M", "S"]
-    return "".join([("%" + s if s in date_chars else s) for s in str(date_str)])
-
-
-def format_datestr(date_str: str) -> str:
-    return "".join([s.lstrip("%") for s in str(date_str)])
-
-
 def extract_base_name(path: str) -> str:
     return os.path.splitext(os.path.basename(path))[0]
 
 
+def extract_invalid_formats(date_str: str) -> list[str]:
+    invalid_fms = [r"%c", r"%x", r"%X"]
+    return list(set(f for f in invalid_fms if f in date_str))
+
+
 def extract_invalid_chars(path: str) -> list[str]:
     invalid_chars = r'<>:"/\|?*'
-    return [c for c in path if c in invalid_chars]
+    return list(set(c for c in path if c in invalid_chars))
 
 
 def replace_path_filename(path: str, f_name: str) -> str:

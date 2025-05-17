@@ -4,7 +4,6 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from pathlib import Path
 
-from photo_rename.filing import format_datestr, parse_datestr
 from photo_rename.shared import NamingMethod
 
 APP_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +23,6 @@ class Config:
             self.last_opened_folder = Path(self.last_opened_folder)
         if not isinstance(self.naming_method, NamingMethod):
             self.naming_method = NamingMethod(self.naming_method)
-        self.date_format = parse_datestr(format_datestr(self.date_format))
 
         if not self.last_opened_folder.exists():
             self.last_opened_folder = Path.home()
