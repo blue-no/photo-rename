@@ -64,6 +64,9 @@ class MainWindow(QMainWindow):
         self.button_select_files.clicked.connect(self._on_file_button_clicked)
         self.button_reset.clicked.connect(self._on_reset_button_clicked)
         self.table_file_names.itemChanged.connect(self._on_table_item_changed)
+        self.table_file_names.itemDoubleClicked.connect(
+            self._on_table_item_double_clicked
+        )
         self.text_date_format.editingFinished.connect(self._on_date_fmt_changed)
         self.radio_group.idClicked.connect(self._on_radio_clicked)
         self.button_apply.clicked.connect(self._on_apply_button_clicked)
@@ -88,6 +91,11 @@ class MainWindow(QMainWindow):
 
     def _on_table_item_changed(self, item: QTableWidgetItem) -> None:
         self.__vm.update_table_data(item.data(Qt.UserRole), item.text())
+
+    def _on_table_item_double_clicked(self, item: QTableWidgetItem) -> None:
+        if item.column() != 0:
+            return
+        self.__vm.view_table_data(item.data(Qt.UserRole))
 
     def _on_table_created(self, table: list[str]) -> None:
         n_rows = len(table)

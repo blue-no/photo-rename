@@ -84,6 +84,13 @@ class MainWindowModel(QObject):
             self._paths.pop(index)
         self.path_map_created.emit(self._path_map)
 
+    def open_file(self, index: int) -> None:
+        path = self._path_map[index].original_path
+        try:
+            os.startfile(path)
+        except Exception:
+            pass
+
     def apply_path_map(self, index: int) -> tuple[str, RenameResult]:
         map_ = self._path_map[index]
         old_path = map_.original_path
