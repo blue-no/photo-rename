@@ -6,6 +6,7 @@ from PySide6.QtCore import QObject, Signal
 from photo_rename.filing import (
     DateType,
     extract_base_name,
+    extract_suffix,
     replace_path_filename,
 )
 from photo_rename.model import MainWindowModel, PathMap
@@ -89,7 +90,8 @@ class MainWindowViewModel(QObject):
             ori_name = extract_base_name(map_.original_path)
             new_name = extract_base_name(map_.mapped_path)
             dtype = DisplayedDateType.get(map_.dtype)
-            data.append([ori_name, new_name, dtype])
+            ftype = extract_suffix(map_.original_path).lstrip(".").upper()
+            data.append([ori_name, new_name, dtype, ftype])
 
         self.table_created.emit(data)
 
