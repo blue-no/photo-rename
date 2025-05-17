@@ -1,11 +1,11 @@
 import os.path
 import posixpath
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 from pillow_heif import register_heif_opener
 from pymediainfo import MediaInfo
 
@@ -29,6 +29,10 @@ class DateProperty:
 
 def extract_base_name(path: str) -> str:
     return os.path.splitext(os.path.basename(path))[0]
+
+
+def extract_suffix(path: str) -> str:
+    return os.path.splitext(path)[1]
 
 
 def extract_invalid_formats(date_str: str) -> list[str]:
