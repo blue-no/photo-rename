@@ -68,7 +68,9 @@ class MainWindowModel(QObject):
         original_path = self._path_map[index].original_path
         if new_path != original_path:
             other_paths = [
-                path for i, path in enumerate(self._path_map) if i != index
+                path.mapped_path
+                for i, path in enumerate(self._path_map)
+                if i != index
             ]
             new_path = get_unique_path(new_path, other_paths)
         new_map = PathMap(original_path, new_path, DateType.MANUAL)

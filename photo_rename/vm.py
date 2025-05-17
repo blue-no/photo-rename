@@ -101,9 +101,10 @@ class MainWindowViewModel(QObject):
 class DisplayedDateType:
 
     __dict = {
-        DateType.TAKEN: "撮影日",
-        DateType.CREATED: "保存日",
-        DateType.MODIFIED: "更新日",
+        DateType.TAKEN: "撮影日時",
+        DateType.UPDATED: "更新日時",
+        DateType.CREATED: "ファイル作成日時",
+        DateType.MODIFIED: "ファイル更新日",
         DateType.MANUAL: "修正済み",
         DateType.NO_DATA: "(情報なし)",
     }
@@ -129,7 +130,7 @@ class FileTypes:
     def get_all_filters(cls) -> str:
         filter_str = ""
         for name, suffixes in cls.__dict.items():
-            suffix_str = " ".join(["*."+s for s in suffixes])
+            suffix_str = " ".join(["*." + s for s in suffixes])
             filter_str += f";;{name} ({suffix_str})"
         return filter_str
 

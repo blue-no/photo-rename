@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
 
-from PIL import ExifTags, Image
+from PIL import Image
 from pillow_heif import register_heif_opener
 
 register_heif_opener()
@@ -13,6 +13,7 @@ register_heif_opener()
 
 class DateType(Enum):
     TAKEN = auto()
+    UPDATED = auto()
     CREATED = auto()
     MODIFIED = auto()
     MANUAL = auto()
@@ -52,28 +53,38 @@ def replace_path_filename(path: str, f_name: str) -> str:
 
 def _get_dateproperty_from_exif(path: str) -> DateProperty:
     """Get DateTimeOriginal or DateTime from image EXIF metadata"""
-    dt = DateProperty(None, DateType.NO_DATA)
     try:
         with Image.open(path) as img:
             exif_data = img.getexif()
             if not exif_data:
                 return DateProperty(None, DateType.NO_DATA)
 
-            for tag_id, value in exif_data.items():
-                tag = ExifTags.TAGS.get(tag_id, tag_id)
-                if tag == "DateTimeOriginal":
-                    return DateProperty(
-                        datetime.strptime(value, "%Y:%m:%d %H:%M:%S"),
-                        DateType.TAKEN,
-                    )
-                elif tag == "DateTime":
-                    dt = DateProperty(
-                        datetime.strptime(value, "%Y:%m:%d %H:%M:%S"),
-                        DateType.TAKEN,
-                    )
-        return dt
+            try:
+                return DateProperty(
+                    datetime.strptime(
+                        exif_data.get_ifd(34665)[36867],  # DateTimeOriginal
+                        "%Y:%m:%d %H:%M:%S",
+                    ),
+                    DateType.TAKEN,
+                )
+            except KeyError:
+                pass
+
+            try:
+                return DateProperty(
+                    datetime.strptime(
+                        exif_data[306],  # DateTime
+                        "%Y:%m:%d %H:%M:%S",
+                    ),
+                    DateType.UPDATED,
+                )
+            except KeyError:
+                pass
+
+        return DateProperty(None, DateType.NO_DATA)
+
     except Exception:
-        return dt
+        return DateProperty(None, DateType.NO_DATA)
 
 
 def _get_dateproperty_from_system(path: str) -> DateProperty:
