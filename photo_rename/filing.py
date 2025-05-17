@@ -25,7 +25,7 @@ class DateProperty:
     dtype: DateType
 
 
-def parse_datestr(date_str: str) -> datetime:
+def parse_datestr(date_str: str) -> str:
     date_chars = ["Y", "y", "m", "d", "H", "M", "S"]
     return "".join([("%" + s if s in date_chars else s) for s in str(date_str)])
 
@@ -92,37 +92,13 @@ def _get_dateproperty_from_system(path: str) -> DateProperty:
         return DateProperty(None, DateType.NO_DATA)
 
 
-def resolve_best_datetime(path: Path) -> DateProperty:
+def resolve_best_datetime(path: str) -> DateProperty:
     """Select the best available datetime in priority: EXIF > creation > modified"""
     dpropety = _get_dateproperty_from_exif(path)
     if dpropety.dtype != DateType.NO_DATA:
         return dpropety
     else:
         return _get_dateproperty_from_system(path)
-
-
-def format_filename_with_datetime(path: Path, dt: datetime) -> Path:
-    """Generate a new filename by appending datetime to the original name"""
-    timestamp = dt.strftime("%Y%m%d_%H%M%S")
-    new_name = f"{path.stem}_{timestamp}{path.suffix}"
-    return path.with_name(new_name)
-
-
-def rename_image_file(path: Path) -> Path | None:
-    """Rename image file by appending datetime to filename, if applicable"""
-    dt = resolve_best_datetime(path)
-    if not dt:
-        return None
-
-    new_path = format_filename_with_datetime(path, dt)
-    if new_path != path:
-        path.rename(new_path)
-    return new_path
-
-
-def batch_rename_images(paths: list[Path]) -> list[tuple[Path, Path | None]]:
-    """Process a list of image files and rename them accordingly"""
-    return [(p, rename_image_file(p)) for p in paths]
 
 
 def get_unique_path(path: str, other_paths: list[str]) -> str:
