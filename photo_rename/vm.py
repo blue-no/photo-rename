@@ -51,6 +51,9 @@ class MainWindowViewModel(QObject):
     def delete_table_data(self, indices: list[int]) -> None:
         self.__model.delete_path_map(indices)
 
+    def view_table_data(self, index: int) -> None:
+        self.__model.open_file(index)
+
     def set_date_format(self, fmt: str) -> None:
         self.__model.date_format = fmt
 
