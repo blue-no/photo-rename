@@ -1,12 +1,13 @@
 import os.path
 import posixpath
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum, auto
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from pillow_heif import register_heif_opener
+from pymediainfo import MediaInfo
 
 register_heif_opener()
 
@@ -47,40 +48,79 @@ def replace_path_filename(path: str, f_name: str) -> str:
     return posixpath.join(dir_name, f"{f_name}{ext}".format(name=name))
 
 
-def _get_dateproperty_from_exif(path: str) -> DateProperty:
-    """Get DateTimeOriginal or DateTime from image EXIF metadata"""
+def _get_dateproperty_from_metadata(path: str) -> DateProperty:
+    """Get DateTimeOriginal or DateTime from metadata"""
     try:
-        with Image.open(path) as img:
-            exif_data = img.getexif()
-            if not exif_data:
-                return DateProperty(None, DateType.NO_DATA)
-
-            try:
-                return DateProperty(
-                    datetime.strptime(
-                        exif_data.get_ifd(34665)[36867],  # DateTimeOriginal
-                        "%Y:%m:%d %H:%M:%S",
-                    ),
-                    DateType.TAKEN,
-                )
-            except KeyError:
-                pass
-
-            try:
-                return DateProperty(
-                    datetime.strptime(
-                        exif_data[306],  # DateTime
-                        "%Y:%m:%d %H:%M:%S",
-                    ),
-                    DateType.UPDATED,
-                )
-            except KeyError:
-                pass
-
-        return DateProperty(None, DateType.NO_DATA)
-
+        with Image.open(path) as image:
+            exif_data = image.getexif()
+            return _parse_image_metadata(exif_data)
     except Exception:
+        pass
+
+    try:
+        tag_data = MediaInfo.parse(path)
+        return _parse_media_metadata(tag_data)
+    except Exception:
+        pass
+
+    return DateProperty(None, DateType.NO_DATA)
+
+
+def _parse_image_metadata(meta_data: Image.Exif) -> DateProperty:
+    if not meta_data:
         return DateProperty(None, DateType.NO_DATA)
+
+    try:
+        return DateProperty(
+            datetime.strptime(
+                meta_data.get_ifd(34665)[36867],  # DateTimeOriginal
+                "%Y:%m:%d %H:%M:%S",
+            ),
+            DateType.TAKEN,
+        )
+    except KeyError:
+        pass
+
+    try:
+        return DateProperty(
+            datetime.strptime(
+                meta_data[306],  # DateTime
+                "%Y:%m:%d %H:%M:%S",
+            ),
+            DateType.UPDATED,
+        )
+    except KeyError:
+        pass
+
+    return DateProperty(None, DateType.NO_DATA)
+
+
+def _parse_media_metadata(meta_data: MediaInfo) -> DateProperty:
+    track = next(
+        (t for t in meta_data.tracks if t.track_type == "General"), None
+    )
+
+    date = track.encoded_date
+    if date is not None:
+        return DateProperty(
+            datetime.strptime(
+                " ".join(str(date).split(" ")[:2]),
+                "%Y-%m-%d %H:%M:%S",
+            ),
+            DateType.TAKEN,
+        )
+
+    date = track.tagged_date
+    if date is not None:
+        return DateProperty(
+            datetime.strptime(
+                " ".join(str(date).split(" ")[:2]),
+                "%Y-%m-%d %H:%M:%S",
+            ),
+            DateType.UPDATED,
+        )
+
+    return DateProperty(None, DateType.NO_DATA)
 
 
 def _get_dateproperty_from_system(path: str) -> DateProperty:
@@ -101,7 +141,7 @@ def _get_dateproperty_from_system(path: str) -> DateProperty:
 
 def resolve_best_datetime(path: str) -> DateProperty:
     """Select the best available datetime in priority: EXIF > creation > modified"""
-    dpropety = _get_dateproperty_from_exif(path)
+    dpropety = _get_dateproperty_from_metadata(path)
     if dpropety.dtype != DateType.NO_DATA:
         return dpropety
     else:
