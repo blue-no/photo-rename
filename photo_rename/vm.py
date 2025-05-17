@@ -28,7 +28,7 @@ class MainWindowViewModel(QObject):
         return FileTypes.get_all_filters()
 
     def get_default_type_filter(self) -> str:
-        return FileTypes.get_filter("すべての画像ファイル")
+        return FileTypes.get_filter("すべての画像・動画ファイル")
 
     def update_paths(self, paths: list[str]) -> None:
         paths_ = []
@@ -104,9 +104,9 @@ class DisplayedDateType:
     __dict = {
         DateType.TAKEN: "撮影日時",
         DateType.UPDATED: "更新日時",
-        DateType.CREATED: "ファイル作成日時",
-        DateType.MODIFIED: "ファイル更新日時",
-        DateType.MANUAL: "修正済み",
+        DateType.CREATED: "PC上での作成日時",
+        DateType.MODIFIED: "PC上での更新日時",
+        DateType.MANUAL: "(修正済み)",
         DateType.NO_DATA: "(情報なし)",
     }
 
@@ -117,14 +117,16 @@ class DisplayedDateType:
 
 class FileTypes:
 
-    __all = ["jpg", "jpeg", "png", "bmp", "gif", "heic", "heif"]
+    __all = ["jpg", "jpeg", "png", "bmp", "gif", "heic", "heif", "mov", "mp4"]
     __dict = {
-        "すべての画像ファイル": __all,
+        "すべての画像・動画ファイル": __all,
         "HEIFファイル": ["heic", "heif"],
         "JPEGファイル": ["jpg", "jpeg"],
         "PNGファイル": ["png"],
         "BMPファイル": ["bmp"],
         "GIFファイル": ["gif"],
+        "MOVファイル": ["mov"],
+        "MP4ファイル": ["mp4"],
     }
 
     @classmethod
