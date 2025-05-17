@@ -104,7 +104,7 @@ class DisplayedDateType:
         DateType.TAKEN: "撮影日時",
         DateType.UPDATED: "更新日時",
         DateType.CREATED: "ファイル作成日時",
-        DateType.MODIFIED: "ファイル更新日",
+        DateType.MODIFIED: "ファイル更新日時",
         DateType.MANUAL: "修正済み",
         DateType.NO_DATA: "(情報なし)",
     }
