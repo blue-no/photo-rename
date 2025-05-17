@@ -26,7 +26,7 @@ def main() -> None:
     vm = MainWindowViewModel(model)
     window = MainWindow(vm, ui)
     window.setWindowTitle(APP_NAME)
-    window.show()
+    window.showMaximized()
 
     sys.exit(app.exec())
 
