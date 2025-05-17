@@ -23,6 +23,14 @@ from photo_rename.shared import RenameResult
 from photo_rename.vm import MainWindowViewModel
 
 
+class ColumnIndex:
+
+    BEFORE = 0
+    AFTER = 1
+    DATE = 2
+    TYPE = 3
+
+
 class MainWindow(QMainWindow):
 
     def __init__(self, vm: MainWindowViewModel, ui_file: QFile) -> None:
@@ -97,7 +105,7 @@ class MainWindow(QMainWindow):
         self.__vm.update_table_data(item.data(Qt.UserRole), item.text())
 
     def _on_table_item_double_clicked(self, item: QTableWidgetItem) -> None:
-        if item.column() != 0:
+        if item.column() != ColumnIndex.BEFORE:
             return
         self.__vm.view_table_data(item.data(Qt.UserRole))
 
@@ -108,7 +116,6 @@ class MainWindow(QMainWindow):
         self.table_file_names.clearContents()
         self.table_file_names.setRowCount(0)
 
-        self.table_file_names.setColumnCount(3)
         self.table_file_names.setRowCount(n_rows)
 
         for index, row in enumerate(table):
@@ -136,8 +143,8 @@ class MainWindow(QMainWindow):
         self.table_file_names.setSortingEnabled(False)
 
         for irow in range(self.table_file_names.rowCount()):
-            item1 = self.table_file_names.item(irow, 1)
-            item2 = self.table_file_names.item(irow, 2)
+            item1 = self.table_file_names.item(irow, ColumnIndex.AFTER)
+            item2 = self.table_file_names.item(irow, ColumnIndex.DATE)
             if item1.data(Qt.UserRole) != index:
                 continue
 
