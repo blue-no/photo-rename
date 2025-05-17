@@ -4,6 +4,6 @@ QWidget {
 }
 
 QPushButton, QLineEdit {
-    min-height: 22px;
     min-width: 100px;
+    padding: 5px;
 }

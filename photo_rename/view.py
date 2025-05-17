@@ -14,7 +14,11 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
 )
 
-from photo_rename.filing import extract_base_name, extract_invalid_chars
+from photo_rename.filing import (
+    extract_base_name,
+    extract_invalid_chars,
+    extract_invalid_formats,
+)
 from photo_rename.shared import RenameResult
 from photo_rename.vm import MainWindowViewModel
 
@@ -144,11 +148,14 @@ class MainWindow(QMainWindow):
             return
 
         invalid_chars = extract_invalid_chars(text)
-        if invalid_chars:
+        invalid_fmts = extract_invalid_formats(text)
+        invalids_strs = [f'"{s}"' for s in (invalid_chars + invalid_fmts)]
+        if invalids_strs:
             QMessageBox.warning(
                 self,
-                "無効な文字",
-                f"無効な文字が含まれています: {', '.join(invalid_chars)}",
+                "無効な文字・書式",
+                "無効な文字・書式が含まれています:"
+                f" \n{', '.join(invalids_strs)}",
             )
             self.text_date_format.setText(self.__vm.get_date_format())
             return

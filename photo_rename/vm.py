@@ -6,8 +6,6 @@ from PySide6.QtCore import QObject, Signal
 from photo_rename.filing import (
     DateType,
     extract_base_name,
-    format_datestr,
-    parse_datestr,
     replace_path_filename,
 )
 from photo_rename.model import MainWindowModel, PathMap
@@ -54,10 +52,10 @@ class MainWindowViewModel(QObject):
         self.__model.delete_path_map(indices)
 
     def set_date_format(self, fmt: str) -> None:
-        self.__model.date_format = parse_datestr(fmt)
+        self.__model.date_format = fmt
 
     def get_date_format(self) -> str:
-        return format_datestr(self.__model.date_format)
+        return self.__model.date_format
 
     def set_naming_method(self, id_: int) -> None:
         self.__model.naming_method = NamingMethod(id_)
