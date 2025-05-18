@@ -1,4 +1,5 @@
 from PySide6.QtCore import QFile, Qt
+from PySide6.QtGui import QResizeEvent
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
     QButtonGroup,
@@ -69,9 +70,8 @@ class MainWindow(QMainWindow):
             id=2,
         )
 
-        self.table_file_names.horizontalHeader().setSectionResizeMode(
-            QHeaderView.Stretch
-        )
+        header = self.table_file_names.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Fixed)
 
         self.button_select_files.clicked.connect(self._on_file_button_clicked)
         self.button_reset.clicked.connect(self._on_reset_button_clicked)
@@ -85,6 +85,8 @@ class MainWindow(QMainWindow):
 
         self.text_date_format.setText(self.__vm.get_date_format())
         self.radio_group.button(self.__vm.get_naming_method()).setChecked(True)
+
+        self._column_ratios = [0.35, 0.35, 0.15, 0.15]
 
     def _on_file_button_clicked(self) -> None:
         dialog = QFileDialog(
@@ -221,3 +223,16 @@ class MainWindow(QMainWindow):
             message += f"\n\n以下のファイル名の変更に失敗しました:\n{failure_names_str}"
 
         QMessageBox.information(self, "名前の変更", message)
+
+    def show(self) -> None:
+        super().show()
+        self.__adjust_column_width()
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super().resizeEvent(event)
+        self.__adjust_column_width()
+
+    def __adjust_column_width(self) -> None:
+        total_width = self.table_file_names.viewport().width()
+        for i, ratio in enumerate(self._column_ratios):
+            self.table_file_names.setColumnWidth(i, int(total_width * ratio))
