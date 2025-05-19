@@ -6,8 +6,7 @@ from PySide6.QtCore import QObject, Signal
 from photo_rename.filing import (
     DateType,
     extract_base_name,
-    format_datestr,
-    parse_datestr,
+    extract_suffix,
     replace_path_filename,
 )
 from photo_rename.model import MainWindowModel, PathMap
@@ -30,7 +29,7 @@ class MainWindowViewModel(QObject):
         return FileTypes.get_all_filters()
 
     def get_default_type_filter(self) -> str:
-        return FileTypes.get_filter("すべての画像ファイル")
+        return FileTypes.get_filter("すべての画像・動画ファイル")
 
     def update_paths(self, paths: list[str]) -> None:
         paths_ = []
@@ -53,11 +52,14 @@ class MainWindowViewModel(QObject):
     def delete_table_data(self, indices: list[int]) -> None:
         self.__model.delete_path_map(indices)
 
+    def view_table_data(self, index: int) -> None:
+        self.__model.open_file(index)
+
     def set_date_format(self, fmt: str) -> None:
-        self.__model.date_format = parse_datestr(fmt)
+        self.__model.date_format = fmt
 
     def get_date_format(self) -> str:
-        return format_datestr(self.__model.date_format)
+        return self.__model.date_format
 
     def set_naming_method(self, id_: int) -> None:
         self.__model.naming_method = NamingMethod(id_)
@@ -88,7 +90,8 @@ class MainWindowViewModel(QObject):
             ori_name = extract_base_name(map_.original_path)
             new_name = extract_base_name(map_.mapped_path)
             dtype = DisplayedDateType.get(map_.dtype)
-            data.append([ori_name, new_name, dtype])
+            ftype = extract_suffix(map_.original_path).lstrip(".").upper()
+            data.append([ori_name, new_name, dtype, ftype])
 
         self.table_created.emit(data)
 
@@ -101,10 +104,11 @@ class MainWindowViewModel(QObject):
 class DisplayedDateType:
 
     __dict = {
-        DateType.TAKEN: "撮影日",
-        DateType.CREATED: "保存日",
-        DateType.MODIFIED: "更新日",
-        DateType.MANUAL: "修正済み",
+        DateType.TAKEN: "撮影日時",
+        DateType.UPDATED: "更新日時",
+        DateType.CREATED: "PC上での作成日時",
+        DateType.MODIFIED: "PC上での更新日時",
+        DateType.MANUAL: "(修正済み)",
         DateType.NO_DATA: "(情報なし)",
     }
 
@@ -115,21 +119,23 @@ class DisplayedDateType:
 
 class FileTypes:
 
-    __all = ["jpg", "jpeg", "png", "bmp", "gif", "heic", "heif"]
+    __all = ["jpg", "jpeg", "png", "bmp", "gif", "heic", "heif", "mov", "mp4"]
     __dict = {
-        "すべての画像ファイル": __all,
+        "すべての画像・動画ファイル": __all,
         "HEIFファイル": ["heic", "heif"],
         "JPEGファイル": ["jpg", "jpeg"],
         "PNGファイル": ["png"],
         "BMPファイル": ["bmp"],
         "GIFファイル": ["gif"],
+        "MOVファイル": ["mov"],
+        "MP4ファイル": ["mp4"],
     }
 
     @classmethod
     def get_all_filters(cls) -> str:
         filter_str = ""
         for name, suffixes in cls.__dict.items():
-            suffix_str = " ".join(["*."+s for s in suffixes])
+            suffix_str = " ".join(["*." + s for s in suffixes])
             filter_str += f";;{name} ({suffix_str})"
         return filter_str
 

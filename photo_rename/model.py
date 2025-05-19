@@ -68,7 +68,9 @@ class MainWindowModel(QObject):
         original_path = self._path_map[index].original_path
         if new_path != original_path:
             other_paths = [
-                path for i, path in enumerate(self._path_map) if i != index
+                path.mapped_path
+                for i, path in enumerate(self._path_map)
+                if i != index
             ]
             new_path = get_unique_path(new_path, other_paths)
         new_map = PathMap(original_path, new_path, DateType.MANUAL)
@@ -81,6 +83,13 @@ class MainWindowModel(QObject):
             self._path_map.pop(index)
             self._paths.pop(index)
         self.path_map_created.emit(self._path_map)
+
+    def open_file(self, index: int) -> None:
+        path = self._path_map[index].original_path
+        try:
+            os.startfile(path)
+        except Exception:
+            pass
 
     def apply_path_map(self, index: int) -> tuple[str, RenameResult]:
         map_ = self._path_map[index]

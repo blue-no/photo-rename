@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>900</width>
     <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
+    <width>900</width>
     <height>400</height>
    </size>
   </property>
@@ -74,28 +74,27 @@
        <property name="sortingEnabled">
         <bool>true</bool>
        </property>
-       <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>188</number>
-       </attribute>
-       <attribute name="horizontalHeaderStretchLastSection">
-        <bool>true</bool>
-       </attribute>
        <attribute name="verticalHeaderVisible">
         <bool>false</bool>
        </attribute>
        <column>
         <property name="text">
-         <string>変更前</string>
+         <string>変更前（ダブルクリックで開く）</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string>変更後（編集可）</string>
+         <string>変更後（ダブルクリックで編集）</string>
         </property>
        </column>
        <column>
         <property name="text">
          <string>日時</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>種類</string>
         </property>
        </column>
       </widget>
@@ -135,7 +134,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>日時の形式</string>
+        <string>追加する文字</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -145,24 +144,92 @@
      <item>
       <widget class="QLineEdit" name="txtDateFormat">
        <property name="text">
-        <string>YYYY-MM-DD_hhmmss</string>
+        <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>  Y : 年(4桁)
-  y : 年(下2桁)
-  m : 月
-  d : 日
-  H : 時
-  M : 分
-  S : 秒</string>
+        <string>日時の書式</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
        </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+       </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>267</width>
+          <height>327</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>&lt;table border=&quot;1&quot; style=&quot;border-collapse: collapse; font-family: sans-serif;&quot;&gt;
+  &lt;tr&gt;
+    &lt;th style=&quot;padding: 0px 6px;&quot;&gt;書式&lt;/th&gt;
+    &lt;th style=&quot;padding: 0px 6px;&quot;&gt;意味&lt;/th&gt;
+    &lt;th style=&quot;padding: 0px 6px;&quot;&gt;例&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%Y&lt;/td&gt;&lt;td&gt;西暦（4桁）&lt;/td&gt;&lt;td&gt;2025&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%y&lt;/td&gt;&lt;td&gt;西暦（下2桁）&lt;/td&gt;&lt;td&gt;25&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%m&lt;/td&gt;&lt;td&gt;月（ゼロ埋め 01〜12）&lt;/td&gt;&lt;td&gt;04&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%B&lt;/td&gt;&lt;td&gt;月名（英語）&lt;/td&gt;&lt;td&gt;April&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%b&lt;/td&gt;&lt;td&gt;月名（省略形、英語）&lt;/td&gt;&lt;td&gt;Apr&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%d&lt;/td&gt;&lt;td&gt;日（ゼロ埋め 01〜31）&lt;/td&gt;&lt;td&gt;01&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%j&lt;/td&gt;&lt;td&gt;年内通算日（001〜366）&lt;/td&gt;&lt;td&gt;091&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%A&lt;/td&gt;&lt;td&gt;曜日（英語）&lt;/td&gt;&lt;td&gt;Tuesday&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%a&lt;/td&gt;&lt;td&gt;曜日（省略形、英語）&lt;/td&gt;&lt;td&gt;Tue&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%w&lt;/td&gt;&lt;td&gt;曜日（数字、0=日曜）&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%U&lt;/td&gt;&lt;td&gt;週番号（日曜始まり）&lt;/td&gt;&lt;td&gt;13&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%W&lt;/td&gt;&lt;td&gt;週番号（月曜始まり）&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%H&lt;/td&gt;&lt;td&gt;時（24時間制、00〜23）&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%I&lt;/td&gt;&lt;td&gt;時（12時間制、01〜12）&lt;/td&gt;&lt;td&gt;03&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%p&lt;/td&gt;&lt;td&gt;午前/午後（AM/PM）&lt;/td&gt;&lt;td&gt;PM&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%M&lt;/td&gt;&lt;td&gt;分（00〜59）&lt;/td&gt;&lt;td&gt;34&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%S&lt;/td&gt;&lt;td&gt;秒（00〜59）&lt;/td&gt;&lt;td&gt;56&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding: 0px 6px;&quot;&gt;%f&lt;/td&gt;&lt;td&gt;マイクロ秒（000000〜999999）&lt;/td&gt;&lt;td&gt;012345&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+
+</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item>
@@ -194,7 +261,7 @@
      <item>
       <widget class="QRadioButton" name="rbtnDateOnly">
        <property name="text">
-        <string>日時のみ</string>
+        <string>追加文字のみ</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -204,14 +271,14 @@
      <item>
       <widget class="QRadioButton" name="rbtnDateBefOri">
        <property name="text">
-        <string>元のファイル名の前に日時</string>
+        <string>元のファイル名の前に追加文字</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="rbtnDateAftOri">
        <property name="text">
-        <string>元のファイル名の後に日時</string>
+        <string>元のファイル名の後に追加文字</string>
        </property>
       </widget>
      </item>

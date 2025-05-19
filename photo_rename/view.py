@@ -1,4 +1,5 @@
 from PySide6.QtCore import QFile, Qt
+from PySide6.QtGui import QResizeEvent
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
     QButtonGroup,
@@ -14,9 +15,21 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
 )
 
-from photo_rename.filing import extract_base_name, extract_invalid_chars
+from photo_rename.filing import (
+    extract_base_name,
+    extract_invalid_chars,
+    extract_invalid_formats,
+)
 from photo_rename.shared import RenameResult
 from photo_rename.vm import MainWindowViewModel
+
+
+class ColumnIndex:
+
+    BEFORE = 0
+    AFTER = 1
+    DATE = 2
+    TYPE = 3
 
 
 class MainWindow(QMainWindow):
@@ -57,19 +70,23 @@ class MainWindow(QMainWindow):
             id=2,
         )
 
-        self.table_file_names.horizontalHeader().setSectionResizeMode(
-            QHeaderView.Stretch
-        )
+        header = self.table_file_names.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Fixed)
 
         self.button_select_files.clicked.connect(self._on_file_button_clicked)
         self.button_reset.clicked.connect(self._on_reset_button_clicked)
         self.table_file_names.itemChanged.connect(self._on_table_item_changed)
+        self.table_file_names.itemDoubleClicked.connect(
+            self._on_table_item_double_clicked
+        )
         self.text_date_format.editingFinished.connect(self._on_date_fmt_changed)
         self.radio_group.idClicked.connect(self._on_radio_clicked)
         self.button_apply.clicked.connect(self._on_apply_button_clicked)
 
         self.text_date_format.setText(self.__vm.get_date_format())
         self.radio_group.button(self.__vm.get_naming_method()).setChecked(True)
+
+        self._column_ratios = [0.35, 0.35, 0.15, 0.15]
 
     def _on_file_button_clicked(self) -> None:
         dialog = QFileDialog(
@@ -89,6 +106,11 @@ class MainWindow(QMainWindow):
     def _on_table_item_changed(self, item: QTableWidgetItem) -> None:
         self.__vm.update_table_data(item.data(Qt.UserRole), item.text())
 
+    def _on_table_item_double_clicked(self, item: QTableWidgetItem) -> None:
+        if item.column() != ColumnIndex.BEFORE:
+            return
+        self.__vm.view_table_data(item.data(Qt.UserRole))
+
     def _on_table_created(self, table: list[str]) -> None:
         n_rows = len(table)
         self.table_file_names.blockSignals(True)
@@ -96,7 +118,6 @@ class MainWindow(QMainWindow):
         self.table_file_names.clearContents()
         self.table_file_names.setRowCount(0)
 
-        self.table_file_names.setColumnCount(3)
         self.table_file_names.setRowCount(n_rows)
 
         for index, row in enumerate(table):
@@ -124,8 +145,8 @@ class MainWindow(QMainWindow):
         self.table_file_names.setSortingEnabled(False)
 
         for irow in range(self.table_file_names.rowCount()):
-            item1 = self.table_file_names.item(irow, 1)
-            item2 = self.table_file_names.item(irow, 2)
+            item1 = self.table_file_names.item(irow, ColumnIndex.AFTER)
+            item2 = self.table_file_names.item(irow, ColumnIndex.DATE)
             if item1.data(Qt.UserRole) != index:
                 continue
 
@@ -144,11 +165,14 @@ class MainWindow(QMainWindow):
             return
 
         invalid_chars = extract_invalid_chars(text)
-        if invalid_chars:
+        invalid_fmts = extract_invalid_formats(text)
+        invalids_strs = [f'"{s}"' for s in (invalid_chars + invalid_fmts)]
+        if invalids_strs:
             QMessageBox.warning(
                 self,
-                "無効な文字",
-                f"無効な文字が含まれています: {', '.join(invalid_chars)}",
+                "無効な文字・書式",
+                "無効な文字・書式が含まれています:"
+                f" \n{', '.join(invalids_strs)}",
             )
             self.text_date_format.setText(self.__vm.get_date_format())
             return
@@ -199,3 +223,16 @@ class MainWindow(QMainWindow):
             message += f"\n\n以下のファイル名の変更に失敗しました:\n{failure_names_str}"
 
         QMessageBox.information(self, "名前の変更", message)
+
+    def show(self) -> None:
+        super().show()
+        self.__adjust_column_width()
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super().resizeEvent(event)
+        self.__adjust_column_width()
+
+    def __adjust_column_width(self) -> None:
+        total_width = self.table_file_names.viewport().width()
+        for i, ratio in enumerate(self._column_ratios):
+            self.table_file_names.setColumnWidth(i, int(total_width * ratio))
