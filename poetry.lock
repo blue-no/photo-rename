@@ -1135,6 +1135,17 @@ files = [
 ]
 
 [[package]]
+name = "tzdata"
+version = "2025.2"
+description = "Provider of IANA time zone data"
+optional = false
+python-versions = ">=2"
+files = [
+    {file = "tzdata-2025.2-py2.py3-none-any.whl", hash = "sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8"},
+    {file = "tzdata-2025.2.tar.gz", hash = "sha256:b60a638fcc0daffadf82fe0f57e53d06bdec2f36c4df66280ae79bce6bd6f2b9"},
+]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.13"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -1148,4 +1159,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.2"
-content-hash = "a72d513ac6931f9feeb79183c1399d59e7e39ccf76d482983a651c67c5efff99"
+content-hash = "0427d98c05d89dc244913150645e7a1483b9412e7ffec09deaec1c6bf6a0838e"
