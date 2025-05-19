@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
+from dateutil import parser
 from PIL import Image
 from pillow_heif import register_heif_opener
 from pymediainfo import MediaInfo
@@ -75,22 +77,16 @@ def _parse_image_metadata(meta_data: Image.Exif) -> DateProperty:
         return DateProperty(None, DateType.NO_DATA)
 
     try:
-        return DateProperty(
-            datetime.strptime(
-                meta_data.get_ifd(34665)[36867],  # DateTimeOriginal
-                "%Y:%m:%d %H:%M:%S",
-            ),
+        return DateProperty(  # DateTimeOriginal
+            _parse_datetime_str_to_jst(meta_data.get_ifd(34665)[36867]),
             DateType.TAKEN,
         )
     except KeyError:
         pass
 
     try:
-        return DateProperty(
-            datetime.strptime(
-                meta_data[306],  # DateTime
-                "%Y:%m:%d %H:%M:%S",
-            ),
+        return DateProperty(  # DateTime
+            _parse_datetime_str_to_jst(meta_data[306]),
             DateType.UPDATED,
         )
     except KeyError:
@@ -107,24 +103,28 @@ def _parse_media_metadata(meta_data: MediaInfo) -> DateProperty:
     date = track.encoded_date
     if date is not None:
         return DateProperty(
-            datetime.strptime(
-                " ".join(str(date).split(" ")[:2]),
-                "%Y-%m-%d %H:%M:%S",
-            ),
+            _parse_datetime_str_to_jst(str(date)),
             DateType.TAKEN,
         )
 
     date = track.tagged_date
     if date is not None:
         return DateProperty(
-            datetime.strptime(
-                " ".join(str(date).split(" ")[:2]),
-                "%Y-%m-%d %H:%M:%S",
-            ),
+            _parse_datetime_str_to_jst(str(date)),
             DateType.UPDATED,
         )
 
     return DateProperty(None, DateType.NO_DATA)
+
+
+def _parse_datetime_str_to_jst(datetime_str: str) -> datetime:
+    date_, *time_ = datetime_str.split(" ")
+    datetime_str = " ".join((date_.replace(":", "-"), *time_))
+    dt = parser.parse(datetime_str)
+
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=ZoneInfo("Asia/Tokyo"))
+    return dt.astimezone(ZoneInfo("Asia/Tokyo"))
 
 
 def _get_dateproperty_from_system(path: str) -> DateProperty:
